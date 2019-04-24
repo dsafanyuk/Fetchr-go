@@ -17,8 +17,8 @@ type DBConfig struct {
 func GetConfig() *Config {
 	return &Config{
 		DB: &DBConfig{
-			Dialect:  "mysql",
-			Username: "root",
+			Dialect:  "postgres",
+			Username: "dave",
 			Password: os.Getenv("DBPASS"),
 			Name:     "test_db",
 			Charset:  "utf8",

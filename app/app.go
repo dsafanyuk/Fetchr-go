@@ -9,6 +9,7 @@ import (
 	"github.com/dsafanyuk/fetchr-go/config"
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 )
 
 // App has router and db instances
@@ -19,14 +20,23 @@ type App struct {
 
 // Initialize initializes the app with predefined configuration
 func (a *App) Initialize(config *config.Config) {
-	dbURI := fmt.Sprintf("%s:%s@/%s?charset=%s&parseTime=True",
+	dbURI := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable",
 		config.DB.Username,
 		config.DB.Password,
-		config.DB.Name,
-		config.DB.Charset)
+		config.DB.Name)
 	a.DB = sqlx.MustConnect(config.DB.Dialect, dbURI)
 	a.Router = mux.NewRouter()
+	a.Router.Use(loggingMiddleware)
 	a.setRouters()
+}
+
+func loggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Do stuff here
+		log.Println(r.Method, r.RequestURI)
+		// Call the next handler, which can be another middleware in the chain, or the final handler.
+		next.ServeHTTP(w, r)
+	})
 }
 
 // setRouters sets the all required routers
@@ -35,7 +45,7 @@ func (a *App) setRouters() {
 	a.Get("/users", a.GetAllUsers)
 	a.Post("/users", a.CreateUser)
 	a.Get("/users/{userID}", a.GetUser)
-	// a.Put("/users/{userID}", a.UpdateUser)
+	a.Put("/users/{userID}", a.UpdateUser)
 	a.Delete("/users/{userID}", a.DeleteUser)
 
 	// a.Get("/orders", a.GetAllOrders)
@@ -87,9 +97,9 @@ func (a *App) GetUser(w http.ResponseWriter, r *http.Request) {
 	handler.GetUser(a.DB, w, r)
 }
 
-// func (a *App) UpdateUser(w http.ResponseWriter, r *http.Request) {
-// 	handler.UpdateUser(a.DB, w, r)
-// }
+func (a *App) UpdateUser(w http.ResponseWriter, r *http.Request) {
+	handler.UpdateUser(a.DB, w, r)
+}
 
 func (a *App) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	handler.DeleteUser(a.DB, w, r)
