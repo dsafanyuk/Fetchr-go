@@ -26,7 +26,7 @@ func (a *App) Initialize(config *config.Config) {
 		config.DB.Name)
 	a.DB = sqlx.MustConnect(config.DB.Dialect, dbURI)
 	a.Router = mux.NewRouter()
-	a.Router.Use(loggingMiddleware)
+	// a.Router.Use(loggingMiddleware)
 	a.setRouters()
 }
 
