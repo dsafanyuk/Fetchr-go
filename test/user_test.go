@@ -6,43 +6,21 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/http/httptest"
-	"os"
 	"testing"
-
-	"github.com/dsafanyuk/fetchr-go/app"
-
-	"github.com/dsafanyuk/fetchr-go/config"
 )
 
-var a app.App
-
-func TestMain(m *testing.M) {
-	config := config.GetConfig()
-	a = app.App{}
-	a.Initialize(config)
-
-	ensureTableExists()
-
-	code := m.Run()
-
-	clearTable()
-
-	os.Exit(code)
-}
-
-func ensureTableExists() {
-	if _, err := a.DB.Exec(tableCreationQuery); err != nil {
+func ensureUserTableExists() {
+	if _, err := a.DB.Exec(userTableCreationQuery); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func clearTable() {
+func clearUserTable() {
 	a.DB.Exec("DELETE FROM users")
 	a.DB.Exec("ALTER SEQUENCE users_user_id_seq RESTART WITH 1")
 }
 
-const tableCreationQuery = `create table if not exists test_db.public.users
+const userTableCreationQuery = `create table if not exists test_db.public.users
 (
   user_id       serial              not null
     constraint users_pk
@@ -60,8 +38,8 @@ const tableCreationQuery = `create table if not exists test_db.public.users
 );
 `
 
-func TestEmptyTable(t *testing.T) {
-	clearTable()
+func TestEmptyUserTable(t *testing.T) {
+	clearUserTable()
 
 	req, _ := http.NewRequest("GET", "/users", nil)
 	response := executeRequest(req)
@@ -74,7 +52,7 @@ func TestEmptyTable(t *testing.T) {
 }
 
 func TestGetNonExistentUser(t *testing.T) {
-	clearTable()
+	clearUserTable()
 
 	req, _ := http.NewRequest("GET", "/users/1", nil)
 	response := executeRequest(req)
@@ -88,7 +66,7 @@ func TestGetNonExistentUser(t *testing.T) {
 	}
 }
 func TestCreateUser(t *testing.T) {
-	clearTable()
+	clearUserTable()
 
 	payload := []byte(`{
 	"email_address":"dave@email.com",
@@ -121,7 +99,7 @@ func TestCreateUser(t *testing.T) {
 }
 
 func TestGetUser(t *testing.T) {
-	clearTable()
+	clearUserTable()
 	addUsers(1)
 
 	req, _ := http.NewRequest("GET", "/users/1", nil)
@@ -130,7 +108,7 @@ func TestGetUser(t *testing.T) {
 	checkResponseCode(t, http.StatusOK, response.Code)
 }
 func TestUpdateUser(t *testing.T) {
-	clearTable()
+	clearUserTable()
 	addUsers(1)
 
 	req, _ := http.NewRequest("GET", "/users/1", nil)
@@ -170,18 +148,5 @@ func addUsers(count int) {
 			%s, %s, %s, %s, %s, %s
 		)`, "'dave@email.com'", "'david1'", "'1234'", "'davy'", "'safanyuk'", "'1234567890'")
 		a.DB.Exec(statement)
-	}
-}
-
-func executeRequest(req *http.Request) *httptest.ResponseRecorder {
-	rr := httptest.NewRecorder()
-	a.Router.ServeHTTP(rr, req)
-
-	return rr
-}
-
-func checkResponseCode(t *testing.T, expected, actual int) {
-	if expected != actual {
-		t.Errorf("Expected response code %d. Got %d\n", expected, actual)
 	}
 }
