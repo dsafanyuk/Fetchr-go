@@ -14,8 +14,11 @@ jobs: # basic units of work in a run
     steps:
       - checkout
       - run:
+          name: set go111module env
+          command: export GO111MODULE=on
+      - run:
           name: get dependencies
-          command: GO111MODULE=on go mod download
+          command: go mod download
       - run:
           name: run build
           command: |
