@@ -11,7 +11,6 @@ Fetchr is a service that has 2 main functions:
 
 ## Code Structure
 
-
 This project will try to follow Domain Driven Design and Hexagonal Architecture.
 
 <details>
