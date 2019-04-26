@@ -14,6 +14,9 @@ jobs: # basic units of work in a run
     steps:
       - checkout
       - run:
+          name: get dependencies
+          command: go mod download
+      - run:
           name: run build
           command: |
             go build ./cmd/user/
