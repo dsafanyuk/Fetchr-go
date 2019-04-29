@@ -87,7 +87,6 @@ func (s *userService) DeleteUser(id string) (*User, error) {
 
 // merges two structs, where a's values take precendence over b's values (a's values will be kept over b's if each field has a value)
 func merge(a, b interface{}) interface{} {
-
 	jb, err := json.Marshal(b)
 	if err != nil {
 		fmt.Println("Marshal error b:", err)

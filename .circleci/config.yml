@@ -4,13 +4,6 @@ jobs: # basic units of work in a run
     docker: # run the steps with Docker
       # CircleCI Go images available at: https://hub.docker.com/r/circleci/golang/
       - image: circleci/golang:1.12 #
-      # CircleCI PostgreSQL images available at: https://hub.docker.com/r/circleci/postgres/
-      - image: circleci/postgres:9.6-alpine
-        environment: # environment variables for primary container
-          POSTGRES_USER: dave
-          POSTGRES_DB: test_db
-          DBPASS: password
-    working_directory: /go/src/github.com/dsafanyuk/fetchr-go
     steps:
       - checkout
       - run:
