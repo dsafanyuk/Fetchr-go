@@ -4,11 +4,11 @@ jobs: # basic units of work in a run
     docker: # run the steps with Docker
       # CircleCI Go images available at: https://hub.docker.com/r/circleci/golang/
       - image: circleci/golang:1.12 #
-      - image: circleci/postgres:9.6-alpine
-        environment: # environment variables for primary container
-          POSTGRES_USER: dave
-          POSTGRES_DB: test_db
-          DBPASS: password
+      # - image: circleci/postgres:9.6-alpine
+      #   environment: # environment variables for primary container
+      #     POSTGRES_USER: dave
+      #     POSTGRES_DB: test_db
+      #     DBPASS: password
     steps:
       - checkout
       - run:
@@ -21,6 +21,3 @@ jobs: # basic units of work in a run
           name: run build
           command: |
             go build ./cmd/user/
-      - run:
-          name: run file
-          command: ./user
